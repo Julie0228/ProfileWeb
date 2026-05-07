@@ -14,7 +14,10 @@
       "Bash(npx vitest *)",
       "Bash(git commit *)",
       "Bash(npx vite *)",
-      "Bash(curl -s http://localhost:5173)"
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(git checkout *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5174/)"
     ]
   }
 }

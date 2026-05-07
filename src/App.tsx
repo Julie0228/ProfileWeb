@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { StarryBackground } from './components/StarryBackground';
 import { NavBar } from './components/NavBar';
 import type { TabKey } from './components/NavBar';
 import { HomeSection } from './sections/HomeSection';
@@ -35,8 +36,10 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
+    <>
+      <StarryBackground />
+      <div className="app">
+        <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
       <main className="app-main">
         <div key={activeTab} className={`section-slide ${animClass}`}>
           {renderSection()}
@@ -48,6 +51,7 @@ function App() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
 
