@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 const TABS = [
   { key: 'home', label: '首页' },
   { key: 'resume', label: '简历' },
@@ -12,8 +14,16 @@ interface NavBarProps {
 }
 
 export function NavBar({ activeTab, onTabChange }: NavBarProps) {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav className="navbar" role="navigation">
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} role="navigation">
       <div className="navbar-inner container">
         <span className="navbar-brand">Profile</span>
         <ul className="navbar-tabs">
