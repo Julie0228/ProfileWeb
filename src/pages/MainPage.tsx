@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { NavBar } from '../components/NavBar';
 import type { TabKey } from '../components/NavBar';
 import { HomeSection } from '../sections/HomeSection';
@@ -24,6 +24,17 @@ export function MainPage() {
     prevIndex.current = newIndex;
     setActiveTab(tab);
   }, []);
+
+  const TAB_TITLES: Record<TabKey, string> = {
+    home: `${profile.name} - 个人主页`,
+    resume: `简历 - ${profile.name}`,
+    projects: `项目 - ${profile.name}`,
+    games: `游戏 - ${profile.name}`,
+  };
+
+  useEffect(() => {
+    document.title = TAB_TITLES[activeTab];
+  }, [activeTab, profile.name]);
 
   const renderSection = () => {
     switch (activeTab) {

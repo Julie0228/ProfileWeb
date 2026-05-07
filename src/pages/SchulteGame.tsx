@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useData } from '../context/DataContext';
 
 type Difficulty = { rows: number; cols: number; label: string };
 
@@ -30,7 +31,12 @@ function assignColors(n: number): string[] {
 }
 
 export function SchulteGame() {
+  const { profile } = useData();
   const [difficulty, setDifficulty] = useState<Difficulty>(DIFFICULTIES[1]);
+
+  useEffect(() => {
+    document.title = `舒尔特方格 - ${profile.name}`;
+  }, [profile.name]);
   const [numbers, setNumbers] = useState<number[]>(() => shuffleArray(25));
   const [colors, setColors] = useState<string[]>(() => assignColors(25));
   const [currentTarget, setCurrentTarget] = useState(1);

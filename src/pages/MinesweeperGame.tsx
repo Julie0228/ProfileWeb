@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useData } from '../context/DataContext';
 
 const ROWS = 12;
 const COLS = 16;
@@ -72,7 +73,12 @@ function neighbors(r: number, c: number): [number, number][] {
 }
 
 export function MinesweeperGame() {
+  const { profile } = useData();
   const [board, setBoard] = useState<Cell[][]>(createBoard);
+
+  useEffect(() => {
+    document.title = `扫雷 - ${profile.name}`;
+  }, [profile.name]);
   const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
   const [flagCount, setFlagCount] = useState(0);
   const [startTime] = useState(Date.now());

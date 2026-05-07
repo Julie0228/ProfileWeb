@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useData } from '../context/DataContext';
 
 const GRID = 20;
 const COLS = 30;
@@ -20,7 +21,12 @@ function createFood(snake: Point[]): Point {
 }
 
 export function SnakeGame() {
+  const { profile } = useData();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    document.title = `贪吃蛇 - ${profile.name}`;
+  }, [profile.name]);
   const snakeRef = useRef<Point[]>([{ x: 15, y: 10 }]);
   const foodRef = useRef<Point>({ x: 20, y: 10 });
   const dirRef = useRef<Point>({ x: 1, y: 0 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import type { ProfileData, SocialLink } from '../data/profile';
 import type { ResumeData, TimelineEntry, Skill } from '../data/resume';
@@ -16,6 +16,10 @@ export function AdminPage() {
   const { profile, resume, projects, updateProfile, updateResume, updateProjects, resetAll } = useData();
   const [activeTab, setActiveTab] = useState<AdminTab>('profile');
   const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    document.title = `管理 - ${profile.name}`;
+  }, [profile.name]);
 
   const flashSaved = () => {
     setSaved(true);
