@@ -2,9 +2,18 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 
-const ROWS = 12;
-const COLS = 16;
-const MINES = 25;
+type Difficulty = {
+  rows: number;
+  cols: number;
+  mines: number;
+  label: string;
+};
+
+const DIFFICULTIES: Difficulty[] = [
+  { rows: 9, cols: 9, mines: 10, label: '初级 9×9' },
+  { rows: 16, cols: 16, mines: 40, label: '中级 16×16' },
+  { rows: 16, cols: 30, mines: 99, label: '高级 16×30' },
+];
 
 type Cell = {
   mine: boolean;
@@ -13,18 +22,19 @@ type Cell = {
   count: number;
 };
 
-function createBoard(): Cell[][] {
-  const mines = new Set<number>();
-  while (mines.size < MINES) {
-    mines.add(Math.floor(Math.random() * ROWS * COLS));
+function createBoard(rows: number, cols: number, mines: number): Cell[][] {
+  const total = rows * cols;
+  const mineSet = new Set<number>();
+  while (mineSet.size < mines) {
+    mineSet.add(Math.floor(Math.random() * total));
   }
 
   const board: Cell[][] = [];
-  for (let r = 0; r < ROWS; r++) {
+  for (let r = 0; r < rows; r++) {
     board.push([]);
-    for (let c = 0; c < COLS; c++) {
+    for (let c = 0; c < cols; c++) {
       board[r].push({
-        mine: mines.has(r * COLS + c),
+        mine: mineSet.has(r * cols + c),
         revealed: false,
         flagged: false,
         count: 0,
@@ -32,15 +42,15 @@ function createBoard(): Cell[][] {
     }
   }
 
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       if (board[r][c].mine) continue;
       let count = 0;
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
           const nr = r + dr;
           const nc = c + dc;
-          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc].mine) {
+          if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && board[nr][nc].mine) {
             count++;
           }
         }
@@ -52,19 +62,14 @@ function createBoard(): Cell[][] {
   return board;
 }
 
-const NUMBER_COLORS = [
-  '', '#60a5fa', '#4ade80', '#f472b6', '#c084fc',
-  '#fb923c', '#facc15', '#f87171', '#a78bfa',
-];
-
-function neighbors(r: number, c: number): [number, number][] {
+function neighbors(r: number, c: number, rows: number, cols: number): [number, number][] {
   const result: [number, number][] = [];
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
       if (dr === 0 && dc === 0) continue;
       const nr = r + dr;
       const nc = c + dc;
-      if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
         result.push([nr, nc]);
       }
     }
@@ -72,29 +77,38 @@ function neighbors(r: number, c: number): [number, number][] {
   return result;
 }
 
+const NUMBER_COLORS = [
+  '', '#60a5fa', '#4ade80', '#f472b6', '#c084fc',
+  '#fb923c', '#facc15', '#f87171', '#a78bfa',
+];
+
 export function MinesweeperGame() {
   const { profile } = useData();
-  const [board, setBoard] = useState<Cell[][]>(createBoard);
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
+  const [board, setBoard] = useState<Cell[][]>([]);
+  const [gameState, setGameState] = useState<'select' | 'playing' | 'won' | 'lost'>('select');
+  const [flagCount, setFlagCount] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const [highlighted, setHighlighted] = useState<Set<string>>(new Set());
+  const timerRef = useRef(0);
+  const startTimeRef = useRef(0);
+  const btnRef = useRef({ left: false, right: false });
+  const configRef = useRef({ rows: 9, cols: 9, mines: 10 });
 
   useEffect(() => {
     document.title = `扫雷 - ${profile.name}`;
   }, [profile.name]);
-  const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
-  const [flagCount, setFlagCount] = useState(0);
-  const [startTime] = useState(Date.now());
-  const [elapsed, setElapsed] = useState(0);
-  const [highlighted, setHighlighted] = useState<Set<string>>(new Set());
-  const timerRef = useRef(0);
-  const btnRef = useRef({ left: false, right: false });
 
   useEffect(() => {
     if (gameState === 'playing') {
-      timerRef.current = setInterval(() => setElapsed(Math.floor((Date.now() - startTime) / 1000)), 1000);
+      startTimeRef.current = Date.now();
+      timerRef.current = setInterval(() => {
+        setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      }, 1000);
     }
     return () => clearInterval(timerRef.current);
-  }, [gameState, startTime]);
+  }, [gameState]);
 
-  // Track mouse button state globally
   useEffect(() => {
     const down = (e: MouseEvent) => {
       if (e.button === 0) btnRef.current.left = true;
@@ -113,24 +127,33 @@ export function MinesweeperGame() {
     };
   }, []);
 
+  const startGame = useCallback((diff: Difficulty) => {
+    configRef.current = { rows: diff.rows, cols: diff.cols, mines: diff.mines };
+    setDifficulty(diff);
+    setBoard(createBoard(diff.rows, diff.cols, diff.mines));
+    setGameState('playing');
+    setFlagCount(0);
+    setElapsed(0);
+    setHighlighted(new Set());
+    clearInterval(timerRef.current);
+  }, []);
+
   const handleCellDown = useCallback((r: number, c: number, e: React.MouseEvent) => {
     if (gameState !== 'playing') return;
 
-    // Track this button press
     if (e.button === 0) btnRef.current.left = true;
     if (e.button === 2) btnRef.current.right = true;
 
     const boardNow = board;
     const cell = boardNow[r][c];
 
-    // Chord: both buttons pressed on a revealed numbered cell
     if (btnRef.current.left && btnRef.current.right && cell.revealed && cell.count > 0) {
       e.preventDefault();
-      const surrounding = neighbors(r, c);
+      const { rows, cols } = configRef.current;
+      const surrounding = neighbors(r, c, rows, cols);
       const flagCountAround = surrounding.filter(([nr, nc]) => boardNow[nr][nc].flagged).length;
 
       if (flagCountAround === cell.count) {
-        // Highlight surrounding cells
         const hl = new Set<string>();
         surrounding.forEach(([nr, nc]) => {
           if (!boardNow[nr][nc].revealed && !boardNow[nr][nc].flagged) {
@@ -142,42 +165,8 @@ export function MinesweeperGame() {
     }
   }, [gameState, board]);
 
-  const handleCellUp = useCallback((r: number, c: number, e: React.MouseEvent) => {
-    if (gameState !== 'playing') return;
-
-    const boardNow = board;
-    const cell = boardNow[r][c];
-
-    // Regular left click
-    if (e.button === 0 && !btnRef.current.right) {
-      reveal(r, c);
-      btnRef.current.left = false;
-      return;
-    }
-
-    // Regular right click (flag)
-    if (e.button === 2 && !btnRef.current.left) {
-      toggleFlag(r, c);
-      btnRef.current.right = false;
-      return;
-    }
-
-    // Chord release: both buttons on revealed numbered cell
-    const bothPressed = (e.button === 0 && btnRef.current.right) || (e.button === 2 && btnRef.current.left);
-    if (bothPressed && cell.revealed && cell.count > 0) {
-      chordReveal(r, c);
-      if (e.button === 0) btnRef.current.left = false;
-      if (e.button === 2) btnRef.current.right = false;
-      setHighlighted(new Set());
-      return;
-    }
-
-    setHighlighted(new Set());
-    if (e.button === 0) btnRef.current.left = false;
-    if (e.button === 2) btnRef.current.right = false;
-  }, [gameState, board]);
-
   const reveal = useCallback((r: number, c: number) => {
+    const { rows, cols, mines } = configRef.current;
     setBoard((prev) => {
       if (prev[r][c].revealed || prev[r][c].flagged) return prev;
       if (prev[r][c].mine) {
@@ -198,7 +187,7 @@ export function MinesweeperGame() {
             for (let dc = -1; dc <= 1; dc++) {
               const nr = cr + dr;
               const nc = cc + dc;
-              if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !next[nr][nc].revealed) {
+              if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !next[nr][nc].revealed) {
                 stack.push([nr, nc]);
               }
             }
@@ -207,7 +196,7 @@ export function MinesweeperGame() {
       }
 
       const unrevealed = next.flat().filter((cell) => !cell.revealed).length;
-      if (unrevealed === MINES) {
+      if (unrevealed === mines) {
         setGameState('won');
       }
 
@@ -216,16 +205,16 @@ export function MinesweeperGame() {
   }, []);
 
   const chordReveal = useCallback((r: number, c: number) => {
+    const { rows, cols, mines } = configRef.current;
     setBoard((prev) => {
       const cell = prev[r][c];
       if (!cell.revealed || cell.count === 0) return prev;
 
-      const surrounding = neighbors(r, c);
+      const surrounding = neighbors(r, c, rows, cols);
       const flagsAround = surrounding.filter(([nr, nc]) => prev[nr][nc].flagged).length;
 
       if (flagsAround !== cell.count) return prev;
 
-      // Check if any unflagged cell is a mine → game over
       const toReveal = surrounding.filter(([nr, nc]) => !prev[nr][nc].revealed && !prev[nr][nc].flagged);
       const hitMine = toReveal.some(([nr, nc]) => prev[nr][nc].mine);
 
@@ -247,7 +236,7 @@ export function MinesweeperGame() {
             for (let dc = -1; dc <= 1; dc++) {
               const nr = cr + dr;
               const nc = cc + dc;
-              if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !next[nr][nc].revealed) {
+              if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !next[nr][nc].revealed) {
                 stack.push([nr, nc]);
               }
             }
@@ -256,7 +245,7 @@ export function MinesweeperGame() {
       }
 
       const unrevealed = next.flat().filter((cell) => !cell.revealed).length;
-      if (unrevealed === MINES) {
+      if (unrevealed === mines) {
         setGameState('won');
       }
 
@@ -274,19 +263,75 @@ export function MinesweeperGame() {
     });
   }, []);
 
-  const reset = useCallback(() => {
-    setBoard(createBoard());
-    setGameState('playing');
-    setFlagCount(0);
+  const handleCellUp = useCallback((r: number, c: number, e: React.MouseEvent) => {
+    if (gameState !== 'playing') return;
+
+    const boardNow = board;
+    const cell = boardNow[r][c];
+
+    if (e.button === 0 && !btnRef.current.right) {
+      reveal(r, c);
+      btnRef.current.left = false;
+      return;
+    }
+
+    if (e.button === 2 && !btnRef.current.left) {
+      toggleFlag(r, c);
+      btnRef.current.right = false;
+      return;
+    }
+
+    const bothPressed = (e.button === 0 && btnRef.current.right) || (e.button === 2 && btnRef.current.left);
+    if (bothPressed && cell.revealed && cell.count > 0) {
+      chordReveal(r, c);
+      if (e.button === 0) btnRef.current.left = false;
+      if (e.button === 2) btnRef.current.right = false;
+      setHighlighted(new Set());
+      return;
+    }
+
     setHighlighted(new Set());
-  }, []);
+    if (e.button === 0) btnRef.current.left = false;
+    if (e.button === 2) btnRef.current.right = false;
+  }, [gameState, board, reveal, toggleFlag, chordReveal]);
+
+  // Select difficulty
+  if (gameState === 'select') {
+    return (
+      <div className="game-page">
+        <div className="game-header">
+          <Link to="/" className="game-back">← 返回</Link>
+          <h1>扫雷</h1>
+        </div>
+        <div className="schulte-select">
+          <p className="schulte-desc">
+            经典扫雷游戏。左键翻开格子，右键标记地雷，找出所有地雷即可获胜。支持双键齐按快速翻开周围格子。
+          </p>
+          <h3>选择难度</h3>
+          <div className="schulte-difficulties">
+            {DIFFICULTIES.map((d) => (
+              <button
+                key={d.label}
+                className="btn-primary"
+                onClick={() => startGame(d)}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const { rows, cols, mines } = configRef.current;
 
   return (
     <div className="game-page">
       <div className="game-header">
         <Link to="/" className="game-back">← 返回</Link>
         <h1>扫雷</h1>
-        <span className="game-score">💣 {MINES - flagCount}</span>
+        <span className="game-score">💣 {mines - flagCount}</span>
         <span className="game-score" style={{ color: 'var(--color-text-secondary)' }}>⏱ {elapsed}s</span>
       </div>
       <div className="minesweeper-board" onContextMenu={(e) => e.preventDefault()}>
@@ -315,10 +360,13 @@ export function MinesweeperGame() {
           </div>
         ))}
       </div>
-      {gameState !== 'playing' && (
+      {(gameState === 'won' || gameState === 'lost') && (
         <div className="game-result">
           <p className="game-over-text">{gameState === 'won' ? '🎉 你赢了！' : '💥 踩到雷了！'}</p>
-          <button className="btn-primary" onClick={reset}>再来一局</button>
+          <div className="schulte-actions">
+            <button className="btn-primary" onClick={() => startGame(difficulty!)}>再来一局</button>
+            <button className="btn-sm" onClick={() => setGameState('select')}>选择难度</button>
+          </div>
         </div>
       )}
       <p className="game-hint" style={{ marginTop: 16 }}>左键翻开 | 右键插旗 | 双键齐按 = 快速翻开周围</p>
