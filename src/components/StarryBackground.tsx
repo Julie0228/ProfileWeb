@@ -11,7 +11,7 @@ interface Star {
   speed: number;    // twinkle speed
 }
 
-const STAR_COUNT = 100;
+const STAR_COUNT = 150;
 const REPEL_RADIUS = 130;
 const REPEL_STRENGTH = 35;
 const RETURN_SPEED = 0.06;
@@ -42,10 +42,10 @@ export function StarryBackground() {
           oy: Math.random() * canvas.height,
           cx: 0,
           cy: 0,
-          r: 0.4 + Math.random() * 1.2,
+          r: 0.4 + Math.random() * 2.0,
           opacity: 0.3 + Math.random() * 0.6,
           phase: Math.random() * Math.PI * 2,
-          speed: 0.005 + Math.random() * 0.015,
+          speed: 0.002 + Math.random() * 0.006,
         });
         stars[i].cx = stars[i].ox;
         stars[i].cy = stars[i].oy;
