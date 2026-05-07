@@ -13,7 +13,6 @@ type Cell = {
 };
 
 function createBoard(): Cell[][] {
-  // Place mines
   const mines = new Set<number>();
   while (mines.size < MINES) {
     mines.add(Math.floor(Math.random() * ROWS * COLS));
@@ -32,7 +31,6 @@ function createBoard(): Cell[][] {
     }
   }
 
-  // Count adjacent mines
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (board[r][c].mine) continue;
@@ -58,13 +56,30 @@ const NUMBER_COLORS = [
   '#fb923c', '#facc15', '#f87171', '#a78bfa',
 ];
 
+function neighbors(r: number, c: number): [number, number][] {
+  const result: [number, number][] = [];
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+        result.push([nr, nc]);
+      }
+    }
+  }
+  return result;
+}
+
 export function MinesweeperGame() {
   const [board, setBoard] = useState<Cell[][]>(createBoard);
   const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
   const [flagCount, setFlagCount] = useState(0);
   const [startTime] = useState(Date.now());
   const [elapsed, setElapsed] = useState(0);
+  const [highlighted, setHighlighted] = useState<Set<string>>(new Set());
   const timerRef = useRef(0);
+  const btnRef = useRef({ left: false, right: false });
 
   useEffect(() => {
     if (gameState === 'playing') {
@@ -73,14 +88,95 @@ export function MinesweeperGame() {
     return () => clearInterval(timerRef.current);
   }, [gameState, startTime]);
 
+  // Track mouse button state globally
+  useEffect(() => {
+    const down = (e: MouseEvent) => {
+      if (e.button === 0) btnRef.current.left = true;
+      if (e.button === 2) btnRef.current.right = true;
+    };
+    const up = (e: MouseEvent) => {
+      if (e.button === 0) btnRef.current.left = false;
+      if (e.button === 2) btnRef.current.right = false;
+      setHighlighted(new Set());
+    };
+    window.addEventListener('mousedown', down);
+    window.addEventListener('mouseup', up);
+    return () => {
+      window.removeEventListener('mousedown', down);
+      window.removeEventListener('mouseup', up);
+    };
+  }, []);
+
+  const handleCellDown = useCallback((r: number, c: number, e: React.MouseEvent) => {
+    if (gameState !== 'playing') return;
+
+    // Track this button press
+    if (e.button === 0) btnRef.current.left = true;
+    if (e.button === 2) btnRef.current.right = true;
+
+    const boardNow = board;
+    const cell = boardNow[r][c];
+
+    // Chord: both buttons pressed on a revealed numbered cell
+    if (btnRef.current.left && btnRef.current.right && cell.revealed && cell.count > 0) {
+      e.preventDefault();
+      const surrounding = neighbors(r, c);
+      const flagCountAround = surrounding.filter(([nr, nc]) => boardNow[nr][nc].flagged).length;
+
+      if (flagCountAround === cell.count) {
+        // Highlight surrounding cells
+        const hl = new Set<string>();
+        surrounding.forEach(([nr, nc]) => {
+          if (!boardNow[nr][nc].revealed && !boardNow[nr][nc].flagged) {
+            hl.add(`${nr},${nc}`);
+          }
+        });
+        setHighlighted(hl);
+      }
+    }
+  }, [gameState, board]);
+
+  const handleCellUp = useCallback((r: number, c: number, e: React.MouseEvent) => {
+    if (gameState !== 'playing') return;
+
+    const boardNow = board;
+    const cell = boardNow[r][c];
+
+    // Regular left click
+    if (e.button === 0 && !btnRef.current.right) {
+      reveal(r, c);
+      btnRef.current.left = false;
+      return;
+    }
+
+    // Regular right click (flag)
+    if (e.button === 2 && !btnRef.current.left) {
+      toggleFlag(r, c);
+      btnRef.current.right = false;
+      return;
+    }
+
+    // Chord release: both buttons on revealed numbered cell
+    const bothPressed = (e.button === 0 && btnRef.current.right) || (e.button === 2 && btnRef.current.left);
+    if (bothPressed && cell.revealed && cell.count > 0) {
+      chordReveal(r, c);
+      if (e.button === 0) btnRef.current.left = false;
+      if (e.button === 2) btnRef.current.right = false;
+      setHighlighted(new Set());
+      return;
+    }
+
+    setHighlighted(new Set());
+    if (e.button === 0) btnRef.current.left = false;
+    if (e.button === 2) btnRef.current.right = false;
+  }, [gameState, board]);
+
   const reveal = useCallback((r: number, c: number) => {
     setBoard((prev) => {
       if (prev[r][c].revealed || prev[r][c].flagged) return prev;
       if (prev[r][c].mine) {
         setGameState('lost');
-        // Reveal all mines
-        const next = prev.map((row) => row.map((cell) => ({ ...cell, revealed: cell.mine ? true : cell.revealed })));
-        return next;
+        return prev.map((row) => row.map((cell) => ({ ...cell, revealed: cell.mine ? true : cell.revealed })));
       }
 
       const next = prev.map((row) => row.map((cell) => ({ ...cell })));
@@ -104,7 +200,6 @@ export function MinesweeperGame() {
         }
       }
 
-      // Check win
       const unrevealed = next.flat().filter((cell) => !cell.revealed).length;
       if (unrevealed === MINES) {
         setGameState('won');
@@ -114,8 +209,56 @@ export function MinesweeperGame() {
     });
   }, []);
 
-  const toggleFlag = useCallback((r: number, c: number, e: React.MouseEvent) => {
-    e.preventDefault();
+  const chordReveal = useCallback((r: number, c: number) => {
+    setBoard((prev) => {
+      const cell = prev[r][c];
+      if (!cell.revealed || cell.count === 0) return prev;
+
+      const surrounding = neighbors(r, c);
+      const flagsAround = surrounding.filter(([nr, nc]) => prev[nr][nc].flagged).length;
+
+      if (flagsAround !== cell.count) return prev;
+
+      // Check if any unflagged cell is a mine → game over
+      const toReveal = surrounding.filter(([nr, nc]) => !prev[nr][nc].revealed && !prev[nr][nc].flagged);
+      const hitMine = toReveal.some(([nr, nc]) => prev[nr][nc].mine);
+
+      if (hitMine) {
+        setGameState('lost');
+        return prev.map((row) => row.map((cell) => ({ ...cell, revealed: cell.mine ? true : cell.revealed })));
+      }
+
+      const next = prev.map((row) => row.map((cell) => ({ ...cell })));
+      const stack = toReveal;
+
+      while (stack.length > 0) {
+        const [cr, cc] = stack.pop()!;
+        if (next[cr][cc].revealed || next[cr][cc].flagged) continue;
+        next[cr][cc].revealed = true;
+
+        if (next[cr][cc].count === 0) {
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const nr = cr + dr;
+              const nc = cc + dc;
+              if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !next[nr][nc].revealed) {
+                stack.push([nr, nc]);
+              }
+            }
+          }
+        }
+      }
+
+      const unrevealed = next.flat().filter((cell) => !cell.revealed).length;
+      if (unrevealed === MINES) {
+        setGameState('won');
+      }
+
+      return next;
+    });
+  }, []);
+
+  const toggleFlag = useCallback((r: number, c: number) => {
     setBoard((prev) => {
       const next = prev.map((row) => row.map((cell) => ({ ...cell })));
       if (next[r][c].revealed) return prev;
@@ -129,6 +272,7 @@ export function MinesweeperGame() {
     setBoard(createBoard());
     setGameState('playing');
     setFlagCount(0);
+    setHighlighted(new Set());
   }, []);
 
   return (
@@ -145,9 +289,15 @@ export function MinesweeperGame() {
             {row.map((cell, c) => (
               <button
                 key={c}
-                className={`ms-cell ${cell.revealed ? 'revealed' : ''} ${cell.mine && cell.revealed ? 'mine' : ''} ${cell.flagged ? 'flagged' : ''}`}
-                onClick={gameState === 'playing' ? () => reveal(r, c) : undefined}
-                onContextMenu={gameState === 'playing' ? (e) => toggleFlag(r, c, e) : undefined}
+                className={
+                  `ms-cell` +
+                  (cell.revealed ? ' revealed' : '') +
+                  (cell.mine && cell.revealed ? ' mine' : '') +
+                  (cell.flagged ? ' flagged' : '') +
+                  (highlighted.has(`${r},${c}`) ? ' chord-hover' : '')
+                }
+                onMouseDown={gameState === 'playing' ? (e) => handleCellDown(r, c, e) : undefined}
+                onMouseUp={gameState === 'playing' ? (e) => handleCellUp(r, c, e) : undefined}
               >
                 {cell.revealed && cell.mine && '💣'}
                 {cell.revealed && !cell.mine && cell.count > 0 && (
@@ -165,7 +315,7 @@ export function MinesweeperGame() {
           <button className="btn-primary" onClick={reset}>再来一局</button>
         </div>
       )}
-      <p className="game-hint" style={{ marginTop: 16 }}>左键翻开 | 右键插旗</p>
+      <p className="game-hint" style={{ marginTop: 16 }}>左键翻开 | 右键插旗 | 双键齐按 = 快速翻开周围</p>
     </div>
   );
 }
