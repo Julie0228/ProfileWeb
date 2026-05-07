@@ -476,3 +476,15 @@ a:hover {
     font-size: 16px;
   }
 }
+
+/* ===== Scroll Entrance ===== */
+.scroll-enter {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+
+.scroll-enter.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
