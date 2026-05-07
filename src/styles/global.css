@@ -535,3 +535,197 @@ a:hover {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ===== Admin Page ===== */
+.admin-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: calc(var(--nav-height) + 24px) 24px 80px;
+  min-height: 100vh;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.admin-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-saved {
+  font-size: 13px;
+  color: #4ade80;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.admin-saved.visible {
+  opacity: 1;
+}
+
+.admin-back-link {
+  color: var(--color-accent);
+  font-size: 14px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0;
+}
+
+.admin-tab {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.admin-tab:hover {
+  color: var(--color-text-primary);
+}
+
+.admin-tab.active {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-accent);
+}
+
+.editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editor-subsection {
+  margin-top: 8px;
+}
+
+.editor-subsection h3,
+.editor-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 12px;
+}
+
+.editor-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.field-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+input, textarea {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 200ms ease;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--color-accent);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.editor-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-gradient-end);
+}
+
+.btn-sm {
+  background: var(--color-card-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.btn-sm:hover {
+  background: var(--color-border);
+}
+
+.btn-danger {
+  color: #ef4444;
+  border-color: #3a1a1a;
+  background: #1a1010;
+}
+
+.btn-danger:hover {
+  background: #2a1515;
+}
+
+.admin-footer {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}

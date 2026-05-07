@@ -17,7 +17,8 @@
       "Bash(curl -s http://localhost:5173)",
       "Bash(git checkout *)",
       "Bash(npm run *)",
-      "Bash(curl -s http://localhost:5174/)"
+      "Bash(curl -s http://localhost:5174/)",
+      "Bash(curl -s http://localhost:5174/admin)"
     ]
   }
 }
