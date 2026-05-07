@@ -41,6 +41,13 @@ describe('MainPage', () => {
     expect(screen.getByText('个人博客系统')).toBeInTheDocument();
   });
 
+  it('switches to GamesSection when clicking 游戏 tab', async () => {
+    renderMainPage();
+    await userEvent.click(screen.getByRole('button', { name: '游戏' }));
+    expect(screen.getByText('贪吃蛇')).toBeInTheDocument();
+    expect(screen.getByText('扫雷')).toBeInTheDocument();
+  });
+
   it('renders footer', () => {
     renderMainPage();
     expect(screen.getByText(/©/)).toBeInTheDocument();

@@ -4,15 +4,19 @@ import type { TabKey } from '../components/NavBar';
 import { HomeSection } from '../sections/HomeSection';
 import { ResumeSection } from '../sections/ResumeSection';
 import { ProjectsSection } from '../sections/ProjectsSection';
+import { GamesSection } from '../sections/GamesSection';
 import { useData } from '../context/DataContext';
+import { games as defaultGames } from '../data/games';
 
-const TAB_ORDER: Record<TabKey, number> = { home: 0, resume: 1, projects: 2 };
+const TAB_ORDER: Record<TabKey, number> = { home: 0, resume: 1, projects: 2, games: 3 };
 
 export function MainPage() {
   const { profile, resume, projects } = useData();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
   const [animClass, setAnimClass] = useState('');
   const prevIndex = useRef(0);
+
+  const games = defaultGames;
 
   const handleTabChange = useCallback((tab: TabKey) => {
     const newIndex = TAB_ORDER[tab];
@@ -29,6 +33,8 @@ export function MainPage() {
         return <ResumeSection data={resume} isActive={true} />;
       case 'projects':
         return <ProjectsSection data={projects} isActive={true} />;
+      case 'games':
+        return <GamesSection data={games} isActive={true} />;
     }
   };
 

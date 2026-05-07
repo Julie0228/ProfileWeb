@@ -4,6 +4,7 @@ const TABS = [
   { key: 'home', label: '首页' },
   { key: 'resume', label: '简历' },
   { key: 'projects', label: '项目' },
+  { key: 'games', label: '游戏' },
 ] as const;
 
 export type TabKey = (typeof TABS)[number]['key'];

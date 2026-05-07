@@ -9,6 +9,7 @@ describe('NavBar', () => {
     expect(screen.getByText('首页')).toBeInTheDocument();
     expect(screen.getByText('简历')).toBeInTheDocument();
     expect(screen.getByText('项目')).toBeInTheDocument();
+    expect(screen.getByText('游戏')).toBeInTheDocument();
   });
 
   it('highlights active tab', () => {
