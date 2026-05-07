@@ -16,9 +16,9 @@ function App() {
     <div className="app">
       <NavBar activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="app-main">
-        <HomeSection data={profile} isActive={activeTab === 'home'} />
-        <ResumeSection data={resume} isActive={activeTab === 'resume'} />
-        <ProjectsSection data={projects} isActive={activeTab === 'projects'} />
+        {activeTab === 'home' && <HomeSection data={profile} isActive={true} />}
+        {activeTab === 'resume' && <ResumeSection data={resume} isActive={true} />}
+        {activeTab === 'projects' && <ProjectsSection data={projects} isActive={true} />}
       </main>
       <footer className="footer">
         <div className="container">

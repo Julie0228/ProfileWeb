@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HomeSection } from '../sections/HomeSection';
-import { ProfileData } from '../data/profile';
+import type { ProfileData } from '../data/profile';
 
 const data: ProfileData = {
   name: '张三',

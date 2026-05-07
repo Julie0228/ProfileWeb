@@ -1,4 +1,4 @@
-import { ProjectEntry } from '../data/projects';
+import type { ProjectEntry } from '../data/projects';
 import { ProjectCard } from '../components/ProjectCard';
 
 interface ProjectsSectionProps {

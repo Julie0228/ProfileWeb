@@ -3,12 +3,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NavBar } from '../components/NavBar';
 
-const tabs = [
-  { key: 'home', label: '首页' },
-  { key: 'resume', label: '简历' },
-  { key: 'projects', label: '项目' },
-] as const;
-
 describe('NavBar', () => {
   it('renders all tab labels', () => {
     render(<NavBar activeTab="home" onTabChange={() => {}} />);

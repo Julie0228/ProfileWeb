@@ -1,4 +1,4 @@
-import { ResumeData } from '../data/resume';
+import type { ResumeData } from '../data/resume';
 import { Timeline } from '../components/Timeline';
 import { SkillBar } from '../components/SkillBar';
 

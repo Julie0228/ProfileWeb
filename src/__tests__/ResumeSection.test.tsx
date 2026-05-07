@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ResumeSection } from '../sections/ResumeSection';
-import { ResumeData } from '../data/resume';
+import type { ResumeData } from '../data/resume';
 
 const data: ResumeData = {
   education: [

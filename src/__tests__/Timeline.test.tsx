@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Timeline } from '../components/Timeline';
-import { TimelineEntry } from '../data/resume';
+import type { TimelineEntry } from '../data/resume';
 
 const entries: TimelineEntry[] = [
   { id: '1', title: 'Engineer', subtitle: 'Acme Corp', date: '2023', description: 'Did things' },

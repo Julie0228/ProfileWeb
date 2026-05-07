@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ProjectCard } from '../components/ProjectCard';
-import { ProjectEntry } from '../data/projects';
+import type { ProjectEntry } from '../data/projects';
 
 const project: ProjectEntry = {
   id: '1',

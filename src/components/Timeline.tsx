@@ -1,4 +1,4 @@
-import { TimelineEntry } from '../data/resume';
+import type { TimelineEntry } from '../data/resume';
 
 interface TimelineProps {
   entries: TimelineEntry[];

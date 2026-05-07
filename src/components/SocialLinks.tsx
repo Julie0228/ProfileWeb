@@ -1,4 +1,4 @@
-import { SocialLink } from '../data/profile';
+import type { SocialLink } from '../data/profile';
 
 interface SocialLinksProps {
   links: SocialLink[];

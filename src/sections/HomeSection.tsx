@@ -1,4 +1,4 @@
-import { ProfileData } from '../data/profile';
+import type { ProfileData } from '../data/profile';
 import { Avatar } from '../components/Avatar';
 import { SocialLinks } from '../components/SocialLinks';
 

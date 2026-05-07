@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { SocialLinks } from '../components/SocialLinks';
-import { SocialLink } from '../data/profile';
+import type { SocialLink } from '../data/profile';
 
 const links: SocialLink[] = [
   { platform: 'GitHub', url: 'https://github.com/test', icon: '🐙' },
