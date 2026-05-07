@@ -5,6 +5,7 @@ import { MainPage } from './pages/MainPage';
 import { AdminPage } from './pages/AdminPage';
 import { SnakeGame } from './pages/SnakeGame';
 import { MinesweeperGame } from './pages/MinesweeperGame';
+import { SchulteGame } from './pages/SchulteGame';
 import './styles/global.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/game/snake" element={<SnakeGame />} />
             <Route path="/game/minesweeper" element={<MinesweeperGame />} />
+            <Route path="/game/schulte" element={<SchulteGame />} />
           </Routes>
         </div>
       </BrowserRouter>
