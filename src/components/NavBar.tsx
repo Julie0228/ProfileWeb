@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 const TABS = [
   { key: 'home', label: '首页' },
-  { key: 'resume', label: '简历' },
-  { key: 'projects', label: '项目' },
+  { key: 'news', label: '新闻' },
+  { key: 'personal', label: '个人信息' },
   { key: 'games', label: '游戏' },
 ] as const;
 

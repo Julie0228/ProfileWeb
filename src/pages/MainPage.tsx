@@ -1,22 +1,24 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { NavBar } from '../components/NavBar';
 import type { TabKey } from '../components/NavBar';
 import { HomeSection } from '../sections/HomeSection';
 import { ResumeSection } from '../sections/ResumeSection';
 import { ProjectsSection } from '../sections/ProjectsSection';
 import { GamesSection } from '../sections/GamesSection';
+import { NewsSection } from '../sections/NewsSection';
 import { useData } from '../context/DataContext';
-import { games as defaultGames } from '../data/games';
 
-const TAB_ORDER: Record<TabKey, number> = { home: 0, resume: 1, projects: 2, games: 3 };
+const TAB_ORDER: Record<TabKey, number> = { home: 0, news: 1, personal: 2, games: 3 };
 
 export function MainPage() {
-  const { profile, resume, projects } = useData();
-  const [activeTab, setActiveTab] = useState<TabKey>('home');
+  const { profile, resume, projects, games } = useData();
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const initialTab: TabKey = tabParam === 'games' ? 'games' : tabParam === 'news' ? 'news' : tabParam === 'personal' ? 'personal' : (tabParam === 'resume' || tabParam === 'projects') ? 'personal' : 'home';
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [animClass, setAnimClass] = useState('');
   const prevIndex = useRef(0);
-
-  const games = defaultGames;
 
   const handleTabChange = useCallback((tab: TabKey) => {
     const newIndex = TAB_ORDER[tab];
@@ -27,9 +29,9 @@ export function MainPage() {
 
   const TAB_TITLES: Record<TabKey, string> = {
     home: `${profile.name} - 个人主页`,
-    resume: `简历 - ${profile.name}`,
-    projects: `项目 - ${profile.name}`,
+    personal: `个人信息 - ${profile.name}`,
     games: `游戏 - ${profile.name}`,
+    news: `新闻 - ${profile.name}`,
   };
 
   useEffect(() => {
@@ -40,12 +42,18 @@ export function MainPage() {
     switch (activeTab) {
       case 'home':
         return <HomeSection data={profile} isActive={true} />;
-      case 'resume':
-        return <ResumeSection data={resume} isActive={true} />;
-      case 'projects':
-        return <ProjectsSection data={projects} isActive={true} />;
+      case 'personal':
+        return (
+          <>
+            <ResumeSection data={resume} isActive={true} />
+            <hr className="section-divider" />
+            <ProjectsSection data={projects} isActive={true} />
+          </>
+        );
       case 'games':
         return <GamesSection data={games} isActive={true} />;
+      case 'news':
+        return <NewsSection isActive={true} />;
     }
   };
 

@@ -228,6 +228,13 @@ a:hover {
   margin-top: 0;
 }
 
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  max-width: var(--max-width);
+  margin: 40px auto;
+}
+
 /* ===== Resume Section ===== */
 .resume-section {
   padding-top: calc(var(--nav-height) + 40px);
@@ -829,6 +836,146 @@ a:hover {
   margin-top: 8px;
 }
 
+.runner-canvas {
+  display: block;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  margin: 0 auto;
+  touch-action: none;
+}
+
+/* ===== News Section ===== */
+.news-section {
+  padding-top: calc(var(--nav-height) + 40px);
+}
+
+.news-subtabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.news-subtab {
+  position: relative;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+
+.news-subtab:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-accent);
+}
+
+.news-subtab.active {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: rgba(59, 130, 246, 0.08);
+  font-weight: 600;
+}
+
+.news-subtab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.news-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  margin-top: -4px;
+  margin-bottom: 24px;
+}
+
+.news-loading,
+.news-error,
+.news-empty {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 48px 0;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.news-card {
+  display: block;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  transition: border-color 200ms ease, background 200ms ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.news-card:hover {
+  border-color: var(--color-accent);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.news-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.news-source {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.news-date {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.news-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.news-summary {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* ===== Admin Page ===== */
 .admin-page {
   max-width: 720px;
@@ -967,6 +1114,61 @@ input:focus, textarea:focus {
 
 textarea {
   resize: vertical;
+}
+
+/* Drag & Drop */
+.drag-hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  margin-top: -8px;
+}
+
+.draggable-card {
+  cursor: grab;
+  position: relative;
+  transition: opacity 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.draggable-card:active {
+  cursor: grabbing;
+}
+
+.draggable-card.dragging {
+  opacity: 0.35;
+}
+
+.draggable-card.drag-over {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.drag-handle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 200ms ease, background 200ms ease;
+}
+
+.drag-handle:hover {
+  color: var(--color-accent);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.draggable-card:active .drag-handle {
+  cursor: grabbing;
+}
+
+.field-row .drag-handle {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .editor-actions {

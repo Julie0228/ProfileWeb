@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface AvatarProps {
   src: string;
@@ -8,6 +8,10 @@ interface AvatarProps {
 
 export function Avatar({ src, alt, size = 120 }: AvatarProps) {
   const [hasError, setHasError] = useState(!src);
+
+  useEffect(() => {
+    setHasError(!src);
+  }, [src]);
   const initial = alt.charAt(0).toUpperCase();
 
   if (hasError) {

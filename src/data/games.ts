@@ -28,4 +28,11 @@ export const games: GameEntry[] = [
     coverUrl: '',
     playUrl: '/game/schulte',
   },
+  {
+    id: 'runner',
+    name: '跑酷',
+    description: '三条跑道跑酷游戏。跳跃或蹲下躲避障碍物，收集金币，速度越来越快。支持键盘和触屏操作。',
+    coverUrl: '',
+    playUrl: '/game/runner',
+  },
 ];

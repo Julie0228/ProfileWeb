@@ -6,6 +6,7 @@ import { AdminPage } from './pages/AdminPage';
 import { SnakeGame } from './pages/SnakeGame';
 import { MinesweeperGame } from './pages/MinesweeperGame';
 import { SchulteGame } from './pages/SchulteGame';
+import { RunnerGame } from './pages/RunnerGame';
 import './styles/global.css';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/game/snake" element={<SnakeGame />} />
             <Route path="/game/minesweeper" element={<MinesweeperGame />} />
             <Route path="/game/schulte" element={<SchulteGame />} />
+            <Route path="/game/runner" element={<RunnerGame />} />
           </Routes>
         </div>
       </BrowserRouter>

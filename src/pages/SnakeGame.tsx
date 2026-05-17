@@ -141,7 +141,7 @@ export function SnakeGame() {
   return (
     <div className="game-page">
       <div className="game-header">
-        <Link to="/" className="game-back">← 返回</Link>
+        <Link to="/?tab=games" className="game-back">← 返回</Link>
         <h1>贪吃蛇</h1>
         <span className="game-score">分数: {score}</span>
       </div>

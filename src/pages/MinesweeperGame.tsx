@@ -300,7 +300,7 @@ export function MinesweeperGame() {
     return (
       <div className="game-page">
         <div className="game-header">
-          <Link to="/" className="game-back">← 返回</Link>
+          <Link to="/?tab=games" className="game-back">← 返回</Link>
           <h1>扫雷</h1>
         </div>
         <div className="schulte-select">
@@ -329,7 +329,7 @@ export function MinesweeperGame() {
   return (
     <div className="game-page">
       <div className="game-header">
-        <Link to="/" className="game-back">← 返回</Link>
+        <Link to="/?tab=games" className="game-back">← 返回</Link>
         <h1>扫雷</h1>
         <span className="game-score">💣 {mines - flagCount}</span>
         <span className="game-score" style={{ color: 'var(--color-text-secondary)' }}>⏱ {elapsed}s</span>

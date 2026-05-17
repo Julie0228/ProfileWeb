@@ -109,7 +109,7 @@ export function SchulteGame() {
     return (
       <div className="game-page">
         <div className="game-header">
-          <Link to="/" className="game-back">← 返回</Link>
+          <Link to="/?tab=games" className="game-back">← 返回</Link>
           <h1>舒尔特方格</h1>
         </div>
         <div className="schulte-select">
@@ -139,7 +139,7 @@ export function SchulteGame() {
     return (
       <div className="game-page">
         <div className="game-header">
-          <Link to="/" className="game-back">← 返回</Link>
+          <Link to="/?tab=games" className="game-back">← 返回</Link>
           <h1>舒尔特方格</h1>
         </div>
         <div className="schulte-done">
@@ -162,7 +162,7 @@ export function SchulteGame() {
   return (
     <div className="game-page">
       <div className="game-header">
-        <Link to="/" className="game-back">← 返回</Link>
+        <Link to="/?tab=games" className="game-back">← 返回</Link>
         <h1>舒尔特方格</h1>
         <span className="game-score">{formatTime(timer)}</span>
         <span className="schulte-progress">已找到 {foundCount} / {total}</span>
@@ -181,14 +181,13 @@ export function SchulteGame() {
       >
         {numbers.map((num) => {
           let cls = 'schulte-cell';
-          if (clicked.has(num)) cls += ' done';
           if (errorCell === num) cls += ' error';
 
           return (
             <button
               key={num}
               className={cls}
-              style={clicked.has(num) ? undefined : { color: colors[num - 1] }}
+              style={{ color: colors[num - 1] }}
               onClick={() => handleClick(num)}
             >
               {num}
